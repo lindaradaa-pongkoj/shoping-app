@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ShoppingApp - Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{--primary:#6c5ce7;--secondary:#00b894;--danger:#e74c3c;--text:#20242c;--muted:#7b8190;--bg:#f6f7fb;--card:#fff;--border:#e9ebf2;--shadow:0 10px 30px rgba(30,35,60,.08);--radius:18px}
+*{box-sizing:border-box}html,body{margin:0;font-family:Poppins,sans-serif;background:var(--bg);color:var(--text)}
+button,input,textarea,select{font:inherit}button{cursor:pointer;border:0}.app{min-height:100vh;padding-bottom:78px}
+header{position:fixed;top:0;left:0;right:0;height:64px;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:space-between;padding:0 18px;z-index:50;box-shadow:0 2px 15px rgba(0,0,0,.06)}
+.logo{font-weight:700;font-size:21px;color:var(--primary)}.head-actions{display:flex;gap:10px;align-items:center}.icon-btn{width:40px;height:40px;border-radius:50%;background:#f1f2f7;color:var(--text);position:relative}.status-dot{width:9px;height:9px;background:#20bf6b;border:2px solid #fff;border-radius:50%;position:absolute;right:5px;top:4px;display:none}
+main{padding:82px 16px 20px;max-width:1200px;margin:auto}.page{display:none}.page.active{display:block}
+.slider{height:230px;border-radius:24px;overflow:hidden;position:relative;background:linear-gradient(135deg,#6c5ce7,#00b894);box-shadow:var(--shadow);color:white}
+.slide{width:100%;height:100%;object-fit:cover;display:none}.slide.active{display:block}.fallback{height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:30px;font-weight:700;padding:20px}
+.slide-btn{position:absolute;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.3);color:#fff}.prev{left:12px}.next{right:12px}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin:24px 0 12px}.section-title h2{font-size:19px;margin:0}.categories{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 12px;scrollbar-width:none}.categories::-webkit-scrollbar{display:none}.cat{flex:0 0 auto;padding:9px 15px;border-radius:30px;color:#fff;font-weight:600;font-size:12px;box-shadow:0 5px 12px rgba(0,0,0,.1)}.cat.active{outline:3px solid rgba(0,0,0,.12);transform:translateY(-1px)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.card{background:var(--card);border-radius:17px;box-shadow:var(--shadow);overflow:hidden;position:relative;cursor:pointer}.card-img{height:165px;background:#f0f1f5}.card-img img{width:100%;height:100%;object-fit:cover}.card-body{padding:11px}.card h3{font-size:14px;margin:0 0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.price{font-weight:700;color:var(--primary)}.card-actions{display:flex;gap:7px;margin-top:9px}.small-btn{flex:1;padding:8px;border-radius:10px;background:#f1f2f7;color:var(--text);font-size:11px;font-weight:600}.small-btn.cart{background:var(--primary);color:#fff}.wish{position:absolute;right:9px;top:9px;width:34px;height:34px;border-radius:50%;background:#fff;color:#e74c3c;box-shadow:0 4px 10px rgba(0,0,0,.12)}
+.searchbox{display:flex;background:#fff;border:1px solid var(--border);border-radius:14px;padding:5px 12px;align-items:center;gap:8px;margin-bottom:18px}.searchbox input{border:0;outline:0;width:100%;padding:10px;background:transparent}
+.list{display:grid;gap:12px}.list-item{background:#fff;border-radius:15px;padding:12px;box-shadow:var(--shadow);display:flex;gap:12px;align-items:center}.list-item img{width:68px;height:68px;border-radius:12px;object-fit:cover}.grow{flex:1}.list-item h3{margin:0 0 4px;font-size:14px}.muted{color:var(--muted);font-size:12px}.qty{display:flex;align-items:center;gap:8px}.qty button{width:30px;height:30px;border-radius:9px;background:#eeeef5}.total{background:#fff;padding:16px;border-radius:15px;margin-top:14px;box-shadow:var(--shadow);display:flex;justify-content:space-between;font-weight:700}.primary{background:var(--primary);color:#fff;padding:12px 16px;border-radius:12px;font-weight:600}.full{width:100%;margin-top:12px}.empty{text-align:center;padding:45px 15px;color:var(--muted)}
+.bottom{position:fixed;bottom:0;left:0;right:0;height:70px;background:#fff;z-index:60;display:flex;justify-content:space-around;align-items:center;box-shadow:0 -4px 18px rgba(0,0,0,.08)}.nav-item{background:none;color:#8c91a0;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;position:relative}.nav-item i{font-size:19px}.nav-item.active{color:var(--primary)}.badge{position:absolute;top:-5px;right:-9px;background:var(--danger);color:#fff;border-radius:20px;font-size:9px;min-width:17px;height:17px;display:grid;place-items:center;padding:0 4px}
+.overlay{position:fixed;inset:0;background:rgba(13,16,27,.6);display:none;align-items:center;justify-content:center;z-index:100;padding:16px}.overlay.show{display:flex}.modal{background:#fff;border-radius:20px;width:min(520px,100%);max-height:90vh;overflow:auto;padding:20px;position:relative}.modal h2{margin:0 0 15px;font-size:20px}.close{position:absolute;right:13px;top:13px;background:#f1f2f7;width:35px;height:35px;border-radius:50%}.form{display:grid;gap:12px}.form input,.form textarea,.form select{width:100%;padding:11px;border:1px solid var(--border);border-radius:10px;outline:none}.form textarea{min-height:100px;resize:vertical}.error{color:#e74c3c;font-size:12px}.toggle{color:var(--primary);cursor:pointer;font-weight:600}.cart-summary{display:grid;gap:10px}.summary-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}.summary-row:last-child{border-bottom:0}.summary-total{font-size:18px;font-weight:700}.info-box{background:#f7f7fb;border-radius:14px;padding:12px}.summary-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.menu-modal{min-height:100%;width:100%;border-radius:0;display:flex;flex-direction:column}.menu-links{display:grid;gap:5px;margin-top:20px}.menu-links a,.menu-links button{text-decoration:none;color:var(--text);background:#f7f7fa;padding:14px;border-radius:12px;text-align:left}.menu-links i{width:25px;color:var(--primary)}
+.detail-img{width:100%;height:260px;object-fit:cover;border-radius:15px}.order{background:#fff;border-radius:15px;padding:15px;box-shadow:var(--shadow)}.order-top{display:flex;justify-content:space-between;gap:10px}.status{padding:5px 9px;border-radius:20px;background:#fff2cc;color:#946c00;font-size:11px;font-weight:600}
+@media(min-width:700px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.slider{height:320px}.card-img{height:210px}main{padding-left:25px;padding-right:25px}}
+@media(min-width:1050px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+/* ===== Chatbot widget ===== */
+#cb-launch{position:fixed;right:16px;bottom:calc(86px + env(safe-area-inset-bottom,0px));width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#8e7bff);color:#fff;font-size:22px;box-shadow:0 8px 24px rgba(108,92,231,.45);z-index:70;display:grid;place-items:center}
+#cb-launch.hide{display:none}
+#cb-panel{position:fixed;right:16px;bottom:calc(86px + env(safe-area-inset-bottom,0px));width:min(380px,calc(100vw - 32px));height:min(580px,calc(100dvh - 170px));background:#fff;border-radius:20px;box-shadow:0 18px 50px rgba(20,25,50,.28);z-index:80;display:none;flex-direction:column;overflow:hidden;font-family:Poppins,"Hind Siliguri","Noto Sans Bengali",sans-serif}
+#cb-panel.show{display:flex}
+.cb-head{display:flex;align-items:center;gap:10px;padding:13px 14px;background:linear-gradient(135deg,var(--primary),#8e7bff);color:#fff}
+.cb-av{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:17px;flex:0 0 auto}
+.cb-ht{flex:1;min-width:0;line-height:1.3}.cb-ht b{font-size:15px}.cb-ht small{display:block;opacity:.85;font-size:11px}
+#cb-x{background:rgba(255,255,255,.2);color:#fff;width:32px;height:32px;border-radius:50%}
+#cb-log{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px;background:var(--bg)}
+.cb-m{max-width:86%;padding:9px 13px;border-radius:15px;font-size:14px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+.cb-bot{background:#fff;border:1px solid var(--border);align-self:flex-start;border-bottom-left-radius:4px}
+.cb-me{background:var(--primary);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.cb-cards{display:flex;gap:10px;overflow-x:auto;align-self:stretch;padding:2px 2px 6px;scroll-snap-type:x mandatory;scrollbar-width:thin}
+.cb-card{flex:0 0 150px;scroll-snap-align:start;background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.cb-card img{width:100%;height:105px;object-fit:cover;background:#f0f1f5;display:block}
+.cb-card .b{padding:8px}.cb-card h4{margin:0 0 3px;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cb-card .p{font-weight:700;color:var(--primary);font-size:13px}
+.cb-card .a{display:flex;gap:5px;margin-top:7px}
+.cb-card button{flex:1;padding:6px 4px;border-radius:8px;font-size:11px;font-weight:600;background:#f1f2f7;color:var(--text)}
+.cb-card button.c{background:var(--primary);color:#fff}
+.cb-btns{display:flex;flex-wrap:wrap;gap:6px;align-self:flex-start}
+.cb-btns button{background:var(--primary);color:#fff;border-radius:16px;padding:7px 13px;font-size:12px;font-weight:600}
+#cb-chips{display:flex;gap:6px;overflow-x:auto;padding:8px 12px;border-top:1px solid var(--border);background:#fff;scrollbar-width:none}
+#cb-chips::-webkit-scrollbar{display:none}
+#cb-chips button{flex:0 0 auto;border:1px solid var(--primary);background:#fff;color:var(--primary);border-radius:16px;padding:6px 12px;font-size:12px}
+.cb-bar{display:flex;gap:8px;padding:10px;border-top:1px solid var(--border);background:#fff}
+.cb-bar input{flex:1;min-width:0;padding:10px 14px;border:1px solid var(--border);border-radius:22px;outline:none;font-size:16px;background:var(--bg)}
+.cb-bar button{width:42px;height:42px;border-radius:50%;background:var(--primary);color:#fff;flex:0 0 auto}
+.cb-typing{display:flex;gap:4px;padding:12px 14px}.cb-typing i{width:7px;height:7px;border-radius:50%;background:#aab0c4;animation:cbb 1s infinite}.cb-typing i:nth-child(2){animation-delay:.15s}.cb-typing i:nth-child(3){animation-delay:.3s}
+@keyframes cbb{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-4px);opacity:1}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="logo">ShoppingApp</div><div class="head-actions"><button class="icon-btn" id="searchHead"><i class="fa-solid fa-magnifying-glass"></i></button><span id="login-status-indicator" class="status-dot"></span></div></header>
+<main>
+<section id="home" class="page active">
+<div class="slider" id="slider"><div class="fallback">ShoppingApp<br><small style="font-size:13px;font-weight:400">Discover your favorite products</small></div><button class="slide-btn prev" id="prevSlide"><i class="fa-solid fa-chevron-left"></i></button><button class="slide-btn next" id="nextSlide"><i class="fa-solid fa-chevron-right"></i></button></div>
+<div class="section-title"><h2>Categories</h2></div><div id="categories" class="categories"></div>
+<div class="section-title"><h2>Products</h2></div><div id="homeGrid" class="grid"></div>
+</section>
+<section id="search" class="page"><div class="section-title"><h2>Search Products</h2></div><div class="searchbox"><i class="fa-solid fa-search"></i><input id="searchInput" placeholder="Search by product name, category..."></div><div id="searchGrid" class="grid"></div></section>
+<section id="cart" class="page"><div class="section-title"><h2>My Cart</h2></div><div id="cartList" class="list"></div><div id="cartTotal"></div></section>
+<section id="wishlist" class="page"><div class="section-title"><h2>Wishlist</h2></div><div id="wishList" class="list"></div></section>
+<section id="orders" class="page"><div class="section-title"><h2>My Orders</h2></div><div id="ordersList" class="list"></div></section>
+<section id="profile" class="page"><div class="section-title"><h2>Profile</h2></div><div class="list-item"><i class="fa-solid fa-user-circle" style="font-size:38px;color:var(--primary)"></i><div class="grow"><div class="muted">Logged in email</div><b id="profileEmail">Guest</b></div></div></section>
+<section id="about" class="page"><div class="section-title"><h2>About Us</h2></div><div class="list-item"><div><h3>ShoppingApp</h3><p class="muted">A modern client-side e-commerce storefront powered by Firebase.</p></div></div></section>
+<section id="contact" class="page"><div class="section-title"><h2>Contact Us</h2></div><form id="contactForm" class="form"><input id="contactName" required placeholder="Name"><input id="contactEmail" required type="email" placeholder="Email"><textarea id="contactMessage" required placeholder="Message"></textarea><button class="primary">Send Message</button></form></section>
+</main>
+<nav class="bottom"><button class="nav-item active" data-route="home"><i class="fa-solid fa-house"></i>Home</button><button class="nav-item" data-route="wishlist"><i class="fa-regular fa-heart"></i><span id="wishBadge" class="badge">0</span>Wishlist</button><button class="nav-item" data-route="cart"><i class="fa-solid fa-cart-shopping"></i><span id="cartBadge" class="badge">0</span>Cart</button><button class="nav-item" id="menuBtn"><i class="fa-solid fa-bars"></i>Menu</button></nav>
+</div>
+
+<div class="overlay" id="authModal"><div class="modal"><button class="close" data-close="authModal">×</button><h2 id="authTitle">Login</h2><form id="authForm" class="form"><input id="authEmail" type="email" required placeholder="Email"><input id="authPassword" type="password" required minlength="6" placeholder="Password"><div id="authError" class="error"></div><button class="primary" id="authSubmit">Login</button><div class="muted" style="text-align:center"><span id="authToggleText">Don't have an account?</span> <span class="toggle" id="authToggle">Register</span></div></form></div></div>
+<div class="overlay" id="product-detail-modal"><div class="modal"><button class="close" data-close="product-detail-modal">×</button><img id="detailImg" class="detail-img"><h2 id="detailName"></h2><div id="detailPrice" class="price"></div><p id="detailDesc" class="muted"></p><div style="display:flex;gap:8px"><button id="detailCart" class="primary" style="flex:1">Add to Cart</button><button id="detailWish" class="small-btn" style="flex:1">Wishlist</button></div></div></div>
+<div class="overlay" id="checkoutModal"><div class="modal"><button class="close" data-close="checkoutModal">×</button><h2>Shipping Details</h2><form id="checkoutForm" class="form"><input id="shipName" required placeholder="Full Name"><textarea id="shipAddress" required placeholder="Shipping Address"></textarea><button class="primary">Place Order</button></form></div></div>
+<div class="overlay" id="cartInfoModal"><div class="modal"><button class="close" data-close="cartInfoModal">×</button><h2>🛒 Added to Cart</h2><div id="cartInfoContent"></div></div></div>
+<div class="overlay" id="menu-modal"><div class="modal menu-modal"><button class="close" data-close="menu-modal">×</button><h2>Menu</h2><div id="menuLinks" class="menu-links"></div></div></div>
+
+<!-- ===== Chatbot widget ===== -->
+<button id="cb-launch" aria-label="Open chat"><i class="fa-solid fa-comments"></i></button>
+<div id="cb-panel" role="dialog" aria-label="Chat assistant">
+  <div class="cb-head"><div class="cb-av"><i class="fa-solid fa-robot"></i></div><div class="cb-ht"><b id="cb-title">ShoppingApp</b><small>Online assistant • replies instantly</small></div><button id="cb-x" aria-label="Close chat"><i class="fa-solid fa-xmark"></i></button></div>
+  <div id="cb-log"></div>
+  <div id="cb-chips"></div>
+  <div class="cb-bar"><input id="cb-inp" placeholder="Type your question… / প্রশ্ন লিখুন…" autocomplete="off"><button id="cb-send" aria-label="Send"><i class="fa-solid fa-paper-plane"></i></button></div>
+</div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import {getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import {getDatabase,ref,onValue,set,push,update,remove,get} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+const firebaseConfig={
+  apiKey:"AIzaSyB2xGB1bBynakmDQWOiI_yiPcYYwtbmeuY",
+  authDomain:"pongkoj-317d7.firebaseapp.com",
+  databaseURL:"https://pongkoj-317d7-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"pongkoj-317d7",
+  storageBucket:"pongkoj-317d7.firebasestorage.app",
+  messagingSenderId:"73042161080",
+  appId:"1:73042161080:web:e0842d08a64a76cef1734d"
+};
+const firebaseReady=!Object.values(firebaseConfig).some(v=>String(v).startsWith("YOUR_"));
+if(!firebaseReady){
+  document.body.insertAdjacentHTML("afterbegin",`<div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#fff3cd;color:#664d03;padding:12px 16px;text-align:center;font:600 13px Poppins,sans-serif;box-shadow:0 3px 12px #0002">Firebase is not configured. Open this file and replace the YOUR_* firebaseConfig values with your Firebase project credentials.</div>`);
+}
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getDatabase(app);
+const $=id=>document.getElementById(id); let products={},slides=[],currentSlide=0,currentUser=null,authMode="login",selectedProduct=null,selectedCategory="All";
+const localWish=()=>JSON.parse(localStorage.getItem("shopping_wishlist")||"{}");
+const setLocalWish=x=>localStorage.setItem("shopping_wishlist",JSON.stringify(x));
+const money=n=>"৳"+Number(n||0).toFixed(2);
+function route(){let r=location.hash.slice(1)||"home";document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id===r));document.querySelectorAll(".nav-item").forEach(x=>x.classList.toggle("active",x.dataset.route===r));if(r==="cart")renderCart();if(r==="wishlist")renderWishlist();if(r==="orders")loadOrders();if(r==="profile")$("profileEmail").textContent=currentUser?.email||"Guest";if(r==="search")renderSearch($("searchInput").value)}
+window.addEventListener("hashchange",route);
+document.querySelectorAll(".nav-item[data-route]").forEach(b=>b.onclick=()=>location.hash=b.dataset.route);
+$("searchHead").onclick=()=>location.hash="search";$("menuBtn").onclick=()=>open("menu-modal");
+function open(id){$(id).classList.add("show")}function close(id){$(id).classList.remove("show")}
+document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>close(b.dataset.close));
+function productCard(p,id){return `<article class="card" data-id="${id}"><div class="card-img"><img src="${p.imageUrl||"https://via.placeholder.com/500x400?text=Product"}"></div><button class="wish" data-wish="${id}"><i class="fa-${currentUser?"solid":"regular"} fa-heart"></i></button><div class="card-body"><h3>${esc(p.name||"Unnamed")}</h3><div class="price">${money(p.price)}</div><div class="card-actions"><button class="small-btn cart" data-cart="${id}">Add to Cart</button></div></div></article>`}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function renderGrid(el,arr){$(el).innerHTML=arr.length?arr.map(([id,p])=>productCard(p,id)).join(""):`<div class="empty">No products found.</div>`;bindCards(el)}
+function bindCards(el){$(el).querySelectorAll(".card").forEach(c=>c.onclick=e=>{if(e.target.closest("[data-cart],[data-wish]"))return;showDetail(c.dataset.id)});$(el).querySelectorAll("[data-cart]").forEach(b=>b.onclick=e=>{e.stopPropagation();addCart(b.dataset.cart)});$(el).querySelectorAll("[data-wish]").forEach(b=>b.onclick=e=>{e.stopPropagation();toggleWish(b.dataset.wish)})}
+function showDetail(id){selectedProduct=id;let p=products[id];$("detailImg").src=p.imageUrl||"https://via.placeholder.com/700x500?text=Product";$("detailName").textContent=p.name;$("detailPrice").textContent=money(p.price);$("detailDesc").textContent=p.description||"No description available.";open("product-detail-modal")}
+$("detailCart").onclick=()=>addCart(selectedProduct);$("detailWish").onclick=()=>toggleWish(selectedProduct);
+function renderHome(){let arr=Object.entries(products);renderGrid("homeGrid",selectedCategory==="All"?arr:arr.filter(([,p])=>p.category===selectedCategory));renderSearch($("searchInput").value)}
+function renderSearch(q=""){let x=q.toLowerCase();renderGrid("searchGrid",Object.entries(products).filter(([,p])=>`${p.name} ${p.category} ${p.description}`.toLowerCase().includes(x)))}
+$("searchInput").oninput=e=>renderSearch(e.target.value);
+function renderCategories(){let cats=["All",...new Set(Object.values(products).map(p=>p.category).filter(Boolean))];$("categories").innerHTML=cats.map((c,i)=>`<button class="cat ${c===selectedCategory?"active":""}" style="background:hsl(${(i*67)%360} 70% 55%)" data-cat="${esc(c)}">${esc(c)}</button>`).join("");$("categories").querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>{selectedCategory=b.dataset.cat;renderCategories();renderHome()})}
+async function addCart(id){
+  try{
+    if(!currentUser){
+      $("authError").textContent="Please login first to add products to your cart.";
+      open("authModal");
+      return false;
+    }
+    const p=products[id];
+    if(!p){alert("Product could not be found. Please refresh the page.");return false;}
+    const r=ref(db,`users/${currentUser.uid}/cart/${id}`);
+    const snap=await get(r);
+    const old=snap.val()||{};
+    const quantity=Number(old.quantity||0)+1;
+    await set(r,{quantity,name:p.name||"Product",price:Number(p.price)||0,imageUrl:p.imageUrl||""});
+    await updateBadges();
+    showCartInfo(p,quantity);
+    return true;
+  }catch(err){
+    console.error("Add to cart failed:",err);
+    alert("Add to Cart failed: "+(err?.message||"Firebase database error"));
+    return false;
+  }
+}
+function showCartInfo(p,quantity){
+  const deliveryCharge=60;
+  const unitPrice=Number(p.price)||0;
+  const savedAddress=localStorage.getItem("shopping_delivery_address")||"";
+  function renderInfo(q){
+    q=Math.max(1,Number(q)||1);
+    const subtotal=unitPrice*q;
+    const total=subtotal+deliveryCharge;
+    $("cartInfoContent").innerHTML=`
+      <div class="info-box"><b>${esc(p.name||"Product")}</b><div class="muted" style="margin-top:4px">Product added successfully.</div></div>
+      <div class="cart-summary" style="margin-top:12px">
+        <div class="summary-row"><span>Product Quantity</span><div class="qty" style="gap:7px"><button type="button" id="quickQtyMinus" style="width:30px;height:30px;border-radius:9px;background:#eeeef5">−</button><input id="quickQtyInput" type="number" min="1" step="1" value="${q}" style="width:70px;text-align:center;padding:7px;border:1px solid var(--border);border-radius:9px;outline:none"><button type="button" id="quickQtyPlus" style="width:30px;height:30px;border-radius:9px;background:#eeeef5">+</button></div></div>
+        <div class="summary-row"><span>Product Price</span><b>${money(unitPrice)}</b></div>
+        <div class="summary-row"><span>Subtotal</span><b id="quickSubtotal">${money(subtotal)}</b></div>
+        <div class="summary-row"><span>Delivery Charge</span><b>${money(deliveryCharge)}</b></div>
+        <div class="summary-row"><span>Delivery Time</span><b>2–4 Working Days</b></div>
+        <div class="summary-row summary-total"><span>Total</span><span id="quickTotal">${money(total)}</span></div>
+      </div>
+      <div class="form" style="margin-top:12px">
+        <label style="font-size:12px;font-weight:600">Delivery Address</label>
+        <textarea id="quickDeliveryAddress" placeholder="Enter your full delivery address..." required>${esc(savedAddress)}</textarea>
+      </div>
+      <div class="summary-actions">
+        <button type="button" class="small-btn" id="continueShoppingBtn">Continue Shopping</button>
+        <button type="button" class="primary" id="quickCheckoutBtn">Proceed to Checkout</button>
+      </div>`;
+
+    $("quickQtyInput").onchange=async()=>{
+      let nq=Math.max(1,parseInt($("quickQtyInput").value,10)||1);
+      $("quickQtyInput").value=nq;
+      try{
+        await update(ref(db,`users/${currentUser.uid}/cart/${selectedProduct||Object.keys(products).find(k=>products[k]===p)}`),{quantity:nq});
+        renderInfo(nq);
+      }catch(err){alert("Quantity update failed: "+(err?.message||"Firebase database error"));}
+    };
+    $("quickQtyInput").oninput=()=>{
+      let nq=Math.max(1,parseInt($("quickQtyInput").value,10)||1);
+      $("quickSubtotal").textContent=money(unitPrice*nq);
+      $("quickTotal").textContent=money(unitPrice*nq+deliveryCharge);
+    };
+    $("quickQtyMinus").onclick=()=>{
+      const input=$("quickQtyInput"); input.value=Math.max(1,(parseInt(input.value,10)||1)-1); input.dispatchEvent(new Event("change"));
+    };
+    $("quickQtyPlus").onclick=()=>{
+      const input=$("quickQtyInput"); input.value=(parseInt(input.value,10)||1)+1; input.dispatchEvent(new Event("change"));
+    };
+    $("continueShoppingBtn").onclick=()=>close("cartInfoModal");
+    $("quickCheckoutBtn").onclick=()=>{
+      const address=$("quickDeliveryAddress").value.trim();
+      if(!address){alert("Please enter your delivery address.");$("quickDeliveryAddress").focus();return;}
+      localStorage.setItem("shopping_delivery_address",address);
+      close("cartInfoModal");
+      $("shipAddress").value=address;
+      open("checkoutModal");
+    };
+  }
+  // Use the product id that was clicked when available; otherwise find it by object reference.
+  const productId=Object.keys(products).find(k=>products[k]===p);
+  if(productId) selectedProduct=productId;
+  renderInfo(quantity);
+  open("cartInfoModal");
+}
+async function toggleWish(id){if(!currentUser){let w=localWish();if(w[id])delete w[id];else{let p=products[id];w[id]={name:p.name,price:p.price,imageUrl:p.imageUrl||""}}setLocalWish(w);updateBadges();return}let r=ref(db,`users/${currentUser.uid}/wishlist/${id}`);let s=await get(r);if(s.exists())remove(r);else{let p=products[id];set(r,{name:p.name,price:Number(p.price)||0,imageUrl:p.imageUrl||""})}}
+function renderCart(){if(!currentUser){$("cartList").innerHTML=`<div class="empty">Please login to view your cart.</div>`;$("cartTotal").innerHTML="";return}onValue(ref(db,`users/${currentUser.uid}/cart`),s=>{let c=s.val()||{},a=Object.entries(c);$("cartList").innerHTML=a.length?a.map(([id,x])=>`<div class="list-item"><img src="${x.imageUrl||"https://via.placeholder.com/100"}"><div class="grow"><h3>${esc(x.name)}</h3><div class="price">${money(x.price)}</div></div><div class="qty"><button data-q="${id}" data-v="-1">−</button><b>${x.quantity}</b><button data-q="${id}" data-v="1">+</button></div></div>`).join(""):`<div class="empty">Your cart is empty.</div>`;let total=a.reduce((s,[,x])=>s+Number(x.price)*Number(x.quantity),0);$("cartTotal").innerHTML=a.length?`<div class="total"><span>Total</span><span>${money(total)}</span></div><button id="checkoutBtn" class="primary full">Proceed to Checkout</button>`:"";$("cartList").querySelectorAll("[data-q]").forEach(b=>b.onclick=async()=>{let r=ref(db,`users/${currentUser.uid}/cart/${b.dataset.q}`),s=await get(r),x=s.val();let q=(x?.quantity||0)+Number(b.dataset.v);q<=0?remove(r):update(r,{quantity:q})});$("checkoutBtn")?.addEventListener("click",()=>open("checkoutModal"));updateBadges()},{onlyOnce:false})}
+function renderWishlist(){if(!currentUser){let w=localWish();let a=Object.entries(w);$("wishList").innerHTML=a.length?a.map(([id,x])=>`<div class="list-item"><img src="${x.imageUrl||"https://via.placeholder.com/100"}"><div class="grow"><h3>${esc(x.name)}</h3><div class="price">${money(x.price)}</div></div><button class="small-btn" data-move="${id}">Move to Cart</button><button class="small-btn" data-rem="${id}">Remove</button></div>`).join(""):`<div class="empty">Your wishlist is empty.</div>`;bindWishLocal();return}onValue(ref(db,`users/${currentUser.uid}/wishlist`),s=>{let a=Object.entries(s.val()||{});$("wishList").innerHTML=a.length?a.map(([id,x])=>`<div class="list-item"><img src="${x.imageUrl||"https://via.placeholder.com/100"}"><div class="grow"><h3>${esc(x.name)}</h3><div class="price">${money(x.price)}</div></div><button class="small-btn" data-move="${id}">Move to Cart</button><button class="small-btn" data-rem="${id}">Remove</button></div>`).join(""):`<div class="empty">Your wishlist is empty.</div>`;$("wishList").querySelectorAll("[data-move]").forEach(b=>b.onclick=async()=>{await addCart(b.dataset.move);remove(ref(db,`users/${currentUser.uid}/wishlist/${b.dataset.move}`))});$("wishList").querySelectorAll("[data-rem]").forEach(b=>b.onclick=()=>remove(ref(db,`users/${currentUser.uid}/wishlist/${b.dataset.rem}`)));updateBadges()})}
+function bindWishLocal(){let w=localWish();$("wishList").querySelectorAll("[data-move]").forEach(b=>b.onclick=()=>{addCart(b.dataset.move);delete w[b.dataset.move];setLocalWish(w);renderWishlist()});$("wishList").querySelectorAll("[data-rem]").forEach(b=>b.onclick=()=>{delete w[b.dataset.rem];setLocalWish(w);renderWishlist()})}
+async function updateBadges(){let cart=0,wish=0;if(currentUser){let [c,w]=await Promise.all([get(ref(db,`users/${currentUser.uid}/cart`)),get(ref(db,`users/${currentUser.uid}/wishlist`))]);cart=Object.values(c.val()||{}).reduce((s,x)=>s+Number(x.quantity||0),0);wish=Object.keys(w.val()||{}).length}else{wish=Object.keys(localWish()).length} $("cartBadge").textContent=cart;$("wishBadge").textContent=wish}
+function loadOrders(){if(!currentUser){$("ordersList").innerHTML=`<div class="empty">Please login to view orders.</div>`;return}onValue(ref(db,`orders/${currentUser.uid}`),s=>{let a=Object.entries(s.val()||{}).sort((a,b)=>(b[1].date||0)-(a[1].date||0));$("ordersList").innerHTML=a.length?a.map(([id,o])=>`<div class="order"><div class="order-top"><b>#${esc(o.orderId||id)}</b><span class="status">${esc(o.status||"Pending")}</span></div><div class="muted">${new Date(o.date||Date.now()).toLocaleString()}</div><div style="margin-top:8px;font-weight:700">${money(o.totalAmount)}</div></div>`).join(""):`<div class="empty">No orders yet.</div>`})}
+$("checkoutForm").onsubmit=async e=>{e.preventDefault();if(!currentUser)return;let address=$("shipAddress").value.trim();if(!address){alert("Please enter your delivery address.");return;}localStorage.setItem("shopping_delivery_address",address);let s=await get(ref(db,`users/${currentUser.uid}/cart`)),cart=s.val()||{},items=Object.entries(cart).map(([id,x])=>({productId:id,...x})),subtotal=items.reduce((a,x)=>a+Number(x.price)*Number(x.quantity),0),deliveryCharge=60,total=subtotal+deliveryCharge,orderRef=push(ref(db,`orders/${currentUser.uid}`));await set(orderRef,{orderId:orderRef.key,date:Date.now(),userEmail:currentUser.email,items,subtotal,deliveryCharge,deliveryTime:"2-4 Working Days",totalAmount:total,status:"Pending",shippingName:$("shipName").value.trim(),shippingAddress:address});await remove(ref(db,`users/${currentUser.uid}/cart`));e.target.reset();close("checkoutModal");location.hash="orders";alert("Order placed successfully!")};
+$("checkoutBtn")?.addEventListener("click",()=>{ $("shipAddress").value=localStorage.getItem("shopping_delivery_address")||""; open("checkoutModal"); });
+$("contactForm").onsubmit=async e=>{e.preventDefault();await set(push(ref(db,"messages")),{name:$("contactName").value,email:$("contactEmail").value,message:$("contactMessage").value,date:Date.now()});e.target.reset();alert("Message sent successfully!")};
+function authUI(){let links=currentUser?[["profile","Profile","user"],["orders","My Orders","box"],["about","About Us","info"],["contact","Contact Us","envelope"]]:[["about","About Us","info"],["contact","Contact Us","envelope"]];$("menuLinks").innerHTML=links.map(x=>`<a href="#${x[0]}" data-menu><i class="fa-solid fa-${x[2]}"></i>${x[1]}</a>`).join("")+(currentUser?`<button id="logout"><i class="fa-solid fa-right-from-bracket"></i>Logout</button>`:`<button id="loginMenu"><i class="fa-solid fa-right-to-bracket"></i>Login</button>`);$("menuLinks").querySelectorAll("[data-menu]").forEach(a=>a.onclick=()=>close("menu-modal"));$("logout")?.addEventListener("click",()=>signOut(auth));$("loginMenu")?.addEventListener("click",()=>{close("menu-modal");open("authModal")})}
+$("authToggle").onclick=()=>{authMode=authMode==="login"?"register":"login";$("authTitle").textContent=authMode==="login"?"Login":"Register";$("authSubmit").textContent=authMode==="login"?"Login":"Create Account";$("authToggle").textContent=authMode==="login"?"Register":"Login";$("authToggleText").textContent=authMode==="login"?"Don't have an account?":"Already have an account?"};
+$("authForm").onsubmit=async e=>{e.preventDefault();$("authError").textContent="";try{if(!firebaseReady){$("authError").textContent="Firebase is not configured. Add your Firebase config first.";return}let email=$("authEmail").value.trim(),pass=$("authPassword").value;if(authMode==="login")await signInWithEmailAndPassword(auth,email,pass);else await createUserWithEmailAndPassword(auth,email,pass);close("authModal")}catch(err){$("authError").textContent=({
+  "auth/invalid-credential":"Invalid email or password.",
+  "auth/invalid-login-credentials":"Invalid email or password.",
+  "auth/user-not-found":"No account exists with this email.",
+  "auth/wrong-password":"Incorrect password.",
+  "auth/email-already-in-use":"This email is already registered.",
+  "auth/weak-password":"Password must be at least 6 characters."
+}[err.code]||err.message)}};
+onAuthStateChanged(auth,async u=>{currentUser=u;$("login-status-indicator").style.display=u?"block":"none";$("profileEmail").textContent=u?.email||"Guest";authUI();if(u){let w=localWish();for(let [id,x] of Object.entries(w))await set(ref(db,`users/${u.uid}/wishlist/${id}`),x);localStorage.removeItem("shopping_wishlist");await set(ref(db,`users/${u.uid}/email`),u.email)}renderCart();renderWishlist();updateBadges();route()});
+onValue(ref(db,"products"),s=>{
+  products=s.val()||{};
+  if(!Object.keys(products).length){
+    products={
+      demo1:{name:"Premium T-Shirt",category:"Fashion",price:850,imageUrl:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=700&q=80",description:"Comfortable premium cotton T-shirt."},
+      demo2:{name:"Smart Watch",category:"Electronics",price:3200,imageUrl:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=700&q=80",description:"Modern smart watch for everyday use."},
+      demo3:{name:"Running Shoes",category:"Sports",price:2400,imageUrl:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=80",description:"Lightweight shoes for running and training."},
+      demo4:{name:"Backpack",category:"Bags",price:1450,imageUrl:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=700&q=80",description:"Durable everyday backpack."}
+    };
+  }
+  renderCategories();renderHome();
+},err=>console.error("Products read failed:",err));
+onValue(ref(db,"sliderImages"),s=>{slides=Object.values(s.val()||{});let el=$("slider");el.querySelectorAll(".slide").forEach(x=>x.remove());if(slides.length){el.querySelector(".fallback").style.display="none";slides.forEach((x,i)=>{let im=document.createElement("img");im.className="slide"+(i===0?" active":"");im.src=x.downloadURL;el.insertBefore(im,el.firstChild)});currentSlide=0}});setInterval(()=>{let s=document.querySelectorAll(".slide");if(!s.length)return;s[currentSlide].classList.remove("active");currentSlide=(currentSlide+1)%s.length;s[currentSlide].classList.add("active")},5000);
+$("prevSlide").onclick=()=>changeSlide(-1);$("nextSlide").onclick=()=>changeSlide(1);function changeSlide(d){let s=document.querySelectorAll(".slide");if(!s.length)return;s[currentSlide].classList.remove("active");currentSlide=(currentSlide+d+s.length)%s.length;s[currentSlide].classList.add("active")}
+route();
+</script>
+<script type="module">
+/* ===== Chatbot: reads the SAME Firebase data as the store (products, cart, orders) ===== */
+import {getApp} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import {getDatabase,ref,onValue,get,set,push} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+// ---- Only edit this block for info that is NOT stored in your database ----
+// Leave a value as "" and the bot will send people to your Contact Us page instead.
+const CONFIG={
+  name:"ShoppingApp",
+  delivery:{charge:60,time:{en:"2–4 Working Days",bn:"২–৪ কার্যদিবস"},stored:"2-4 Working Days"}, // same as your checkout
+  phone:"",
+  address:{en:"Main Road, Lalmonirhat",bn:"মেইন রোড, লালমনিরহাট"},
+  hours:{en:"10 AM – 9 PM (Closed on Friday)",bn:"সকাল ১০টা – রাত ৯টা (শুক্রবার বন্ধ)"},
+  payments:{en:"Cash on Delivery, bKash, Nagad",bn:"ক্যাশ অন ডেলিভারি, বিকাশ, নগদ"},
+  returnPolicy:{en:"If a product has a defect, it can be returned within 3 days of receiving it.",bn:"পণ্য হাতে পাওয়ার ৩ দিনের মধ্যে ত্রুটি থাকলে রিটার্ন করা যাবে।"}
+};
+// ---------------------------------------------------------------------------
+
+const app=getApp(),auth=getAuth(app),db=getDatabase(app);
+const $=id=>document.getElementById(id);
+let products={},user=null,L="en",step=null,o={},busy=false,welcomed=false;
+const DEMO={ // same fallback the store shows when the database has no products
+  demo1:{name:"Premium T-Shirt",category:"Fashion",price:850,imageUrl:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=700&q=80",description:"Comfortable premium cotton T-shirt."},
+  demo2:{name:"Smart Watch",category:"Electronics",price:3200,imageUrl:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=700&q=80",description:"Modern smart watch for everyday use."},
+  demo3:{name:"Running Shoes",category:"Sports",price:2400,imageUrl:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=80",description:"Lightweight shoes for running and training."},
+  demo4:{name:"Backpack",category:"Bags",price:1450,imageUrl:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=700&q=80",description:"Durable everyday backpack."}
+};
+onValue(ref(db,"products"),s=>{products=s.val()||DEMO},e=>console.error("Chatbot: products read failed",e));
+onAuthStateChanged(auth,u=>{user=u});
+
+// ---------- helpers ----------
+const BN="০১২৩৪৫৬৭৮৯";
+const bn=n=>String(n).replace(/\d/g,d=>BN[d]);
+const en=s=>String(s).replace(/[০-৯]/g,d=>BN.indexOf(d));
+const t=(b,e)=>L==="bn"?b:e;
+const pick=x=>typeof x==="string"?x:(x?(x[L]||x.en||""):"");
+const money=n=>{const s=(Number(n)||0).toLocaleString("en-US",{maximumFractionDigits:2});return "৳"+(L==="bn"?bn(s):s)};
+const R=(text,x={})=>({t:text,...x});
+const entries=()=>Object.entries(products);
+const inStock=p=>{if(p.inStock===false||p.stock===false)return false;if(p.stock===undefined||p.stock===null||p.stock==="")return true;const n=Number(p.stock);return Number.isNaN(n)||n>0};
+const norm=s=>en(String(s||"").toLowerCase()).replace(/[-_]/g,"").replace(/[^\p{L}\p{M}\p{N}\s]/gu," ").replace(/\s+/g," ").trim();
+const PH="data:image/svg+xml;utf8,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="300" height="220"><rect width="100%" height="100%" fill="#eceef5"/><text x="50%" y="52%" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#9aa0b4">No image</text></svg>');
+const go=h=>{location.hash=h;toggle(false)};
+const MENU=()=>L==="bn"?["পণ্য","ক্যাটাগরি","ডেলিভারি","অর্ডার করব","আমার অর্ডার","যোগাযোগ"]:["Products","Categories","Delivery","Order now","My orders","Contact"];
+const cancelLbl=()=>t("বাতিল","Cancel");
+
+// ---------- product search (works with whatever products are in your database) ----------
+const SYN={"টিশার্ট":"tshirt shirt","শার্ট":"shirt","ঘড়ি":"watch","ওয়াচ":"watch","জুতা":"shoes shoe","জুতো":"shoes shoe","স্যান্ডেল":"sandal","ব্যাগ":"bag","ব্যাকপ্যাক":"backpack","প্যান্ট":"pant","জিন্স":"jeans","পাঞ্জাবি":"panjabi punjabi","শাড়ি":"saree","মোবাইল":"phone mobile","ফোন":"phone","হেডফোন":"headphone","ইলেকট্রনিক":"electronics","ফ্যাশন":"fashion","খেলা":"sports","জ্যাকেট":"jacket","টুপি":"cap","ক্যাপ":"cap","পোশাক":"fashion clothes"};
+const STOP=new Set(("give tell me you your do does can could would want need looking for please pls price cost how much many is are there any available in stock have has what which show see details detail info information about product products item items i a an the and or to of my on it this that with now under below less than within budget cheap dam koto ache ki kon er ta tk taka kinbo nibo "+
+"টাকা দাম কত কি কী আছে আমি আমার চাই চাইছি দেখাও দেখান দেখাবেন এর এই ওই টা টি খানা ও কিনব নিব অর্ডার করব করতে করবো পণ্য বিস্তারিত কোনটা কোন একটা একটি দিন দাও স্টকে জানতে বলুন বল নিচে মধ্যে").split(" "));
+const SUF=["গুলো","গুলি","টির","টার","টা","টি","খানা","ের","র"];
+function tokens(m){
+  const out=[];
+  m.split(" ").forEach(w=>{
+    if(!w||STOP.has(w))return;
+    const bnTok=/[\u0980-\u09FF]/.test(w);
+    if(w.length<(bnTok?2:3))return;
+    out.push(w);
+    if(bnTok)for(const k in SYN)if(w.includes(k))out.push(...SYN[k].split(" "));
+  });
+  return out;
+}
+function variants(w){
+  const v=[w];
+  if(/[\u0980-\u09FF]/.test(w)){if(w.length>3)SUF.forEach(s=>{if(w.endsWith(s)&&w.length-s.length>=2)v.push(w.slice(0,-s.length))})}
+  else if(w.length>3&&w.endsWith("s"))v.push(w.slice(0,-1));
+  return v;
+}
+function score(p,toks){
+  const name=norm(p.name),cat=norm(p.category),desc=norm(p.description);let s=0;
+  toks.forEach(w=>{const v=variants(w);
+    if(v.some(x=>name.includes(x)))s+=3;else if(v.some(x=>cat.includes(x)))s+=2;else if(v.some(x=>desc.includes(x)))s+=1;});
+  return s;
+}
+function search(m){
+  const toks=tokens(m);if(!toks.length)return[];
+  return entries().map(([id,p])=>[id,p,score(p,toks)]).filter(x=>x[2]>0).sort((a,b)=>b[2]-a[2]);
+}
+
+// ---------- UI ----------
+const log=$("cb-log"),inp=$("cb-inp");
+$("cb-title").textContent=CONFIG.name;
+function add(text,who){const d=document.createElement("div");d.className="cb-m cb-"+who;d.textContent=text;log.appendChild(d);scroll()}
+function scroll(){log.scrollTop=log.scrollHeight}
+function mkBtn(label,fn,cls){const b=document.createElement("button");b.type="button";b.textContent=label;if(cls)b.className=cls;b.onclick=fn;return b}
+function cardEl(id,p){
+  const d=document.createElement("div");d.className="cb-card";
+  const im=document.createElement("img");im.alt="";im.loading="lazy";im.src=p.imageUrl||PH;im.onerror=()=>{im.onerror=null;im.src=PH};
+  const b=document.createElement("div");b.className="b";
+  const h=document.createElement("h4");h.textContent=p.name||"Product";
+  const pr=document.createElement("div");pr.className="p";pr.textContent=money(p.price);
+  const a=document.createElement("div");a.className="a";
+  a.append(mkBtn(t("বিস্তারিত","Details"),()=>details(id,p)),mkBtn(t("কার্টে দিন","Add to cart"),()=>addCart(id),"c"));
+  b.append(h,pr,a);d.append(im,b);return d;
+}
+function setChips(arr){const c=$("cb-chips");c.innerHTML="";arr.forEach(x=>c.appendChild(mkBtn(x,()=>send(x))))}
+function say(r){
+  if(typeof r==="string")r=R(r);
+  if(r.t)add(r.t,"bot");
+  if(r.cards&&r.cards.length){const w=document.createElement("div");w.className="cb-cards";r.cards.forEach(([id,p])=>w.appendChild(cardEl(id,p)));log.appendChild(w)}
+  if(r.btns&&r.btns.length){const w=document.createElement("div");w.className="cb-btns";r.btns.forEach(x=>w.appendChild(mkBtn(x.l,x.fn)));log.appendChild(w)}
+  setChips(r.chips||(step?[cancelLbl()]:MENU()));scroll();
+}
+function showTyping(){const d=document.createElement("div");d.id="cb-typing";d.className="cb-m cb-bot cb-typing";d.innerHTML="<i></i><i></i><i></i>";log.appendChild(d);scroll()}
+function hideTyping(){$("cb-typing")?.remove()}
+function toggle(open){
+  $("cb-panel").classList.toggle("show",open);$("cb-launch").classList.toggle("hide",open);
+  if(open){
+    if(!welcomed){welcomed=true;say(R(`Hi! 👋 Welcome to ${CONFIG.name}. Ask me about products, prices, delivery or your orders.\nনমস্কার! আপনি বাংলাতেও লিখতে পারেন।`))}
+    setTimeout(()=>inp.focus(),50);scroll();
+  }
+}
+$("cb-launch").onclick=()=>toggle(true);$("cb-x").onclick=()=>toggle(false);
+$("cb-send").onclick=()=>send();
+inp.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.isComposing)send()});
+
+// ---------- actions on real store data ----------
+const loginPrompt=()=>R(t("এই কাজের জন্য আগে লগইন করতে হবে।","Please log in (or register) first to continue."),{btns:[{l:t("লগইন / রেজিস্টার","Login / Register"),fn:()=>$("authModal").classList.add("show")}]});
+function details(id,p){
+  const c=document.querySelector(`.card[data-id="${(window.CSS&&CSS.escape)?CSS.escape(id):id}"]`);
+  if(c){toggle(false);c.click()}else say(productReply(id,p));
+}
+async function badge(){
+  const c=(await get(ref(db,`users/${user.uid}/cart`))).val()||{};
+  const b=$("cartBadge");if(b)b.textContent=Object.values(c).reduce((s,x)=>s+Number(x.quantity||0),0);
+}
+async function addCart(id){
+  const p=products[id];
+  if(!p)return say(t("পণ্যটি পাওয়া যায়নি, পেজ রিফ্রেশ করুন।","Product not found. Please refresh the page."));
+  if(!user)return say(loginPrompt());
+  if(!inStock(p))return say(t(`দুঃখিত, "${p.name}" এখন স্টকে নেই।`,`Sorry, "${p.name}" is out of stock.`));
+  try{
+    const r=ref(db,`users/${user.uid}/cart/${id}`),old=(await get(r)).val()||{},quantity=Number(old.quantity||0)+1;
+    await set(r,{quantity,name:p.name||"Product",price:Number(p.price)||0,imageUrl:p.imageUrl||""});
+    await badge();
+    say(R(t(`✅ "${p.name}" কার্টে যোগ হয়েছে (পরিমাণ: ${quantity})।`,`✅ "${p.name}" added to your cart (quantity: ${quantity}).`),{btns:[{l:t("কার্ট দেখুন","View cart"),fn:()=>go("cart")}]}));
+  }catch(e){console.error(e);say(t("কার্টে যোগ করা যায়নি। আবার চেষ্টা করুন।","Could not add to cart. Please try again."))}
+}
+function listReply(arr,title){
+  if(!arr.length)return R(t("কোনো পণ্য পাওয়া যায়নি।","No products found."));
+  const more=arr.length>8?t(`\n(${arr.length}টির মধ্যে ৮টি দেখানো হচ্ছে। নাম লিখে নির্দিষ্ট পণ্য খুঁজুন।)`,`\n(Showing 8 of ${arr.length}. Type a name to find a specific product.)`):"";
+  return R(title+more,{cards:arr.slice(0,8).map(([id,p])=>[id,p])});
+}
+function productReply(id,p){
+  const l=[p.name,t("দাম: ","Price: ")+money(p.price)];
+  if(p.category)l.push(t("ক্যাটাগরি: ","Category: ")+p.category);
+  if(p.description)l.push(p.description);
+  if(!inStock(p))l.push(t("স্টক: এখন নেই","Availability: out of stock"));
+  return R(l.join("\n"),{cards:[[id,p]],btns:inStock(p)?[{l:t("এটি অর্ডার করব","Order this"),fn:()=>say(startOrder([[id,p,9]]))}]:[]});
+}
+async function ordersReply(){
+  if(!user)return loginPrompt();
+  const a=Object.entries((await get(ref(db,`orders/${user.uid}`))).val()||{}).sort((x,y)=>(y[1].date||0)-(x[1].date||0)).slice(0,3);
+  if(!a.length)return R(t("আপনার কোনো অর্ডার নেই।","You have no orders yet."));
+  const lines=a.map(([id,x])=>`#${x.orderId||id}\n${t("স্ট্যাটাস","Status")}: ${x.status||"Pending"} • ${money(x.totalAmount)}\n${new Date(x.date||Date.now()).toLocaleString()}`);
+  return R(t("আপনার সাম্প্রতিক অর্ডার:\n\n","Your recent orders:\n\n")+lines.join("\n\n"),{btns:[{l:t("সব অর্ডার দেখুন","Open My Orders"),fn:()=>go("orders")}]});
+}
+async function cartReply(){
+  if(!user)return loginPrompt();
+  const a=Object.values((await get(ref(db,`users/${user.uid}/cart`))).val()||{});
+  if(!a.length)return R(t("আপনার কার্ট খালি।","Your cart is empty."));
+  const sub=a.reduce((s,x)=>s+Number(x.price)*Number(x.quantity),0);
+  return R(t("আপনার কার্ট:\n","Your cart:\n")+a.map(x=>`${x.name} × ${x.quantity} — ${money(x.price*x.quantity)}`).join("\n")+`\n\n${t("সাবটোটাল","Subtotal")}: ${money(sub)}`,{btns:[{l:t("কার্টে যান","Go to cart"),fn:()=>go("cart")}]});
+}
+
+// ---------- order flow (writes the same structure as your checkout) ----------
+function startOrder(res){
+  if(!user)return loginPrompt();
+  const all=entries();
+  if(!all.length)return R(t("এখন কোনো পণ্য নেই।","No products are available right now."));
+  if(!res||!res.length){
+    step="product";const lst=all.slice(0,12);
+    return R(t("কোন পণ্যটি নিতে চান? নাম বা নম্বর লিখুন:\n","Which product would you like? Type the name or number:\n")+lst.map(([,p],i)=>`${i+1}. ${p.name} - ${money(p.price)}`).join("\n"),{cards:lst.slice(0,8),chips:[cancelLbl()]});
+  }
+  if(!(res.length===1||res[0][2]>res[1][2])){
+    step="product";
+    return R(t("কোনটি নিতে চান? নাম লিখুন:","Which one do you mean? Type the name:"),{cards:res.slice(0,6).map(([id,p])=>[id,p]),chips:[cancelLbl()]});
+  }
+  const [id,p]=res[0];
+  if(!inStock(p)){step=null;return R(t(`দুঃখিত, "${p.name}" এখন স্টকে নেই।`,`Sorry, "${p.name}" is out of stock.`))}
+  o={id,p};step="qty";
+  return R(t(`"${p.name}" (${money(p.price)}) — কয়টি নেবেন?`,`"${p.name}" (${money(p.price)}) — how many would you like?`),{chips:["1","2","3",cancelLbl()]});
+}
+async function flow(raw){
+  const m=norm(raw);
+  if(/^(cancel|stop|quit|exit|বাতিল|থাক|ক্যানসেল)( |$)/.test(m)){step=null;o={};return R(t("অর্ডার বাতিল করা হয়েছে। আর কীভাবে সাহায্য করতে পারি?","Order cancelled. How else can I help?"))}
+  if(step==="product"){
+    const all=entries().slice(0,12);
+    if(/^\d+$/.test(m)&&+m>=1&&+m<=all.length){const [id,p]=all[+m-1];return startOrder([[id,p,9]])}
+    const res=search(m);
+    if(!res.length)return R(t("পণ্যটি খুঁজে পাইনি। তালিকা থেকে নাম বা নম্বর লিখুন।","I couldn't find that product. Please type a name or number from the list."),{chips:[cancelLbl()]});
+    return startOrder(res);
+  }
+  if(step==="qty"){
+    const n=parseInt(m);if(!n||n<1||n>50)return R(t("সঠিক সংখ্যা লিখুন (যেমন: ২)।","Please enter a valid quantity (e.g. 2)."),{chips:["1","2","3",cancelLbl()]});
+    o.q=n;step="name";return R(t("আপনার নাম কী?","What's your full name?"));
+  }
+  if(step==="name"){o.name=raw.trim().slice(0,80);step="phone";return R(t("আপনার মোবাইল নম্বর দিন (১১ ডিজিট):","Your mobile number (11 digits):"))}
+  if(step==="phone"){
+    let ph=en(raw).replace(/\D/g,"");if(ph.startsWith("880"))ph="0"+ph.slice(3);
+    if(!/^01[3-9]\d{8}$/.test(ph))return R(t("নম্বরটি সঠিক নয়। ১১ ডিজিটের নম্বর দিন (যেমন 017XXXXXXXX)।","That number doesn't look right. Please enter an 11-digit number (e.g. 017XXXXXXXX)."));
+    o.phone=ph;step="addr";
+    const saved=localStorage.getItem("shopping_delivery_address")||"";
+    return R(t("পূর্ণ ঠিকানা লিখুন:","Enter your full delivery address:")+(saved?`\n\n${t("সংরক্ষিত ঠিকানা","Saved address")}: ${saved}`:""),{chips:saved?[t("সংরক্ষিত ঠিকানা ব্যবহার করুন","Use saved address"),cancelLbl()]:[cancelLbl()]});
+  }
+  if(step==="addr"){
+    const saved=localStorage.getItem("shopping_delivery_address")||"";
+    o.addr=(saved&&(m==="use saved address"||m===norm("সংরক্ষিত ঠিকানা ব্যবহার করুন")))?saved:raw.trim();
+    if(o.addr.length<8)return R(t("অনুগ্রহ করে বিস্তারিত ঠিকানা লিখুন।","Please enter a more complete address."));
+    step="confirm";
+    const sub=Number(o.p.price)*o.q,del=CONFIG.delivery.charge;o.sub=sub;o.del=del;o.total=sub+del;
+    return R(t(
+`অর্ডার সারাংশ:\nপণ্য: ${o.p.name} × ${o.q}\nপণ্যের দাম: ${money(sub)}\nডেলিভারি চার্জ: ${money(del)}\nমোট: ${money(o.total)}\nডেলিভারি সময়: ${pick(CONFIG.delivery.time)}\n\nনাম: ${o.name}\nফোন: ${o.phone}\nঠিকানা: ${o.addr}\n\nকনফার্ম করবেন?`,
+`Order summary:\nProduct: ${o.p.name} × ${o.q}\nSubtotal: ${money(sub)}\nDelivery charge: ${money(del)}\nTotal: ${money(o.total)}\nDelivery time: ${pick(CONFIG.delivery.time)}\n\nName: ${o.name}\nPhone: ${o.phone}\nAddress: ${o.addr}\n\nConfirm this order?`),{chips:[t("হ্যাঁ, কনফার্ম","Yes, confirm"),cancelLbl()]});
+  }
+  if(step==="confirm"){
+    if(!(/^(yes|y|ok|okay|confirm|sure|হ্যাঁ|হ্যা|হা|জি|কনফার্ম)( |$)/.test(m)||m.includes("confirm")||m.includes("কনফার্ম")))
+      return R(t("কনফার্ম করতে 'হ্যাঁ' লিখুন অথবা 'বাতিল' লিখুন।","Type 'yes' to confirm or 'cancel' to stop."),{chips:[t("হ্যাঁ, কনফার্ম","Yes, confirm"),cancelLbl()]});
+    if(!user){step=null;return loginPrompt()}
+    try{
+      const orderRef=push(ref(db,`orders/${user.uid}`));
+      await set(orderRef,{orderId:orderRef.key,date:Date.now(),userEmail:user.email,
+        items:[{productId:o.id,name:o.p.name||"Product",price:Number(o.p.price)||0,quantity:o.q,imageUrl:o.p.imageUrl||""}],
+        subtotal:o.sub,deliveryCharge:o.del,deliveryTime:CONFIG.delivery.stored,totalAmount:o.total,status:"Pending",
+        shippingName:o.name,shippingPhone:o.phone,shippingAddress:o.addr});
+      localStorage.setItem("shopping_delivery_address",o.addr);
+      const key=orderRef.key,time=pick(CONFIG.delivery.time);step=null;o={};
+      return R(t(`ধন্যবাদ! ✅ আপনার অর্ডার হয়েছে।\nঅর্ডার আইডি: #${key}\nস্ট্যাটাস: Pending\nডেলিভারি সময়: ${time}`,`Thank you! ✅ Your order has been placed.\nOrder ID: #${key}\nStatus: Pending\nDelivery time: ${time}`),{btns:[{l:t("আমার অর্ডার দেখুন","View My Orders"),fn:()=>go("orders")}]});
+    }catch(e){console.error(e);return R(t("অর্ডার সম্পন্ন করা যায়নি। আবার চেষ্টা করুন।","Could not place the order. Please try again."),{chips:[t("হ্যাঁ, কনফার্ম","Yes, confirm"),cancelLbl()]})}
+  }
+  step=null;return reply(raw);
+}
+
+// ---------- general questions ----------
+async function reply(raw){
+  const m=norm(raw);
+  const K=(...a)=>a.some(w=>m.includes(w)),W=(...a)=>a.some(w=>(" "+m+" ").includes(" "+w+" "));
+  if(W("hi","hello","hey","hlw","salam")||K("হ্যালো","হাই","সালাম","নমস্কার","আসসালামু","assalamu"))
+    return R(t(`নমস্কার! ${CONFIG.name}-এ স্বাগতম। কীভাবে সাহায্য করতে পারি?`,`Hello! Welcome to ${CONFIG.name}. How can I help you?`));
+  if(K("my order","order status","track","myorders","আমার অর্ডার","অর্ডার স্ট্যাটাস","অর্ডারের অবস্থা","অর্ডার কোথায়","অর্ডার কবে"))return ordersReply();
+  if(K("my cart","view cart","show cart","whats in my cart","আমার কার্ট","কার্ট দেখ","কার্টে কি"))return cartReply();
+  if(K("delivery","deliver","shipping","ডেলিভারি","কবে পাব","কতদিন","চার্জ","charge","পৌঁছ","kobe pabo"))
+    return R(t(`ডেলিভারি তথ্য:\nডেলিভারি চার্জ: ${money(CONFIG.delivery.charge)}\nডেলিভারি সময়: ${pick(CONFIG.delivery.time)}`,`Delivery info:\nDelivery charge: ${money(CONFIG.delivery.charge)}\nDelivery time: ${pick(CONFIG.delivery.time)}`));
+  if(K("order","buy","purchase","অর্ডার","কিনব","কিনবো","কিনতে","নিব","নিবো","নিতে চাই","নেব","kinbo","kinte","nibo"))return startOrder(search(m));
+  if(K("payment","bkash","nagad","বিকাশ","নগদ","পেমেন্ট","cash on","টাকা পাঠ")||W("pay","cod")){
+    const v=pick(CONFIG.payments);return v?R(t("পেমেন্ট পদ্ধতি: ","Payment methods: ")+v):contactReply(true);
+  }
+  if(K("return","refund","exchange","ফেরত","রিটার্ন","বদল","রিফান্ড")){const v=pick(CONFIG.returnPolicy);return v?R(v):contactReply(true)}
+  if(K("contact","address","phone number","opening","hours","location","যোগাযোগ","ঠিকানা","ফোন নম্বর","নম্বর","খোলা")||W("call","open"))return contactReply(false);
+  if(K("categor","ক্যাটাগরি","what do you sell","what do you have","what you sell","কি কি আছে","কী কী আছে")){
+    const cats=[...new Set(Object.values(products).map(p=>p.category).filter(Boolean))];
+    if(!cats.length)return listReply(entries(),t("আমাদের পণ্য:","Our products:"));
+    return R(t("আমাদের ক্যাটাগরি:\n","Our categories:\n")+cats.map(c=>`• ${c} (${entries().filter(([,p])=>p.category===c).length})`).join("\n"),
+      {btns:cats.slice(0,8).map(c=>({l:c,fn:()=>say(listReply(entries().filter(([,p])=>p.category===c),c))}))});
+  }
+  const num=parseInt((m.match(/\d+/)||[])[0]);
+  if(num&&K("under","below","less than","within","budget","max","নিচে","মধ্যে","কমে","এর কম","moddhe")){
+    const res=search(m),pool=res.length?res.map(([id,p])=>[id,p]):entries();
+    const arr=pool.filter(([,p])=>Number(p.price)<=num).sort((a,b)=>a[1].price-b[1].price);
+    return arr.length?listReply(arr,t(`${money(num)}-এর মধ্যে পণ্য:`,`Products within ${money(num)}:`)):R(t(`${money(num)}-এর মধ্যে কোনো পণ্য নেই।`,`No products found within ${money(num)}.`));
+  }
+  if(K("cheap","lowest price","সস্তা","কম দামি","কম দামের","সবচেয়ে কম"))
+    return listReply(entries().sort((a,b)=>a[1].price-b[1].price).slice(0,4),t("সবচেয়ে কম দামের পণ্য:","Our most affordable products:"));
+  const res=search(m);
+  if(res.length){
+    if(res.length===1||res[0][2]>=res[1][2]+2)return productReply(res[0][0],res[0][1]);
+    return listReply(res,t("এগুলো পেয়েছি:","Here's what I found:"));
+  }
+  if(K("price","products","product","collection","catalog","দাম","পণ্য","কালেকশন","মূল্য","কত","dam","show me","দেখাও","দেখান"))
+    return listReply(entries(),t("আমাদের পণ্য ও দাম:","Our products & prices:"));
+  if(K("your name","who are you","তোমার নাম","আপনার নাম","কে তুমি"))return R(t(`আমি ${CONFIG.name}-এর চ্যাটবট সহকারী।`,`I'm the ${CONFIG.name} chatbot assistant.`));
+  if(K("thank","ধন্যবাদ"))return R(t("আপনাকেও ধন্যবাদ! আর কিছু জানার থাকলে বলুন।","You're welcome! Let me know if you need anything else."));
+  return R(t("দুঃখিত, আমি বুঝতে পারিনি। নিচের অপশন থেকে বেছে নিন, অথবা পণ্যের নাম লিখুন।","Sorry, I didn't get that. Pick an option below, or type a product name."),{btns:[{l:t("যোগাযোগ পেজ","Contact Us"),fn:()=>go("contact")}]});
+}
+function contactReply(missing){
+  const l=[];
+  if(CONFIG.phone)l.push(t("ফোন: ","Phone: ")+(L==="bn"?bn(CONFIG.phone):CONFIG.phone));
+  const a=pick(CONFIG.address),h=pick(CONFIG.hours);
+  if(a)l.push(t("ঠিকানা: ","Address: ")+a);if(h)l.push(t("খোলা থাকে: ","Open: ")+h);
+  const head=missing?t("এ বিষয়ে বিস্তারিত জানতে আমাদের সাথে যোগাযোগ করুন।","For details on this, please contact us."):"";
+  return R([head,...l].filter(Boolean).join("\n")||t("আমাদের Contact Us পেজ থেকে মেসেজ পাঠান।","Please send us a message from the Contact Us page."),{btns:[{l:t("যোগাযোগ পেজ","Contact Us page"),fn:()=>go("contact")}]});
+}
+
+async function send(text){
+  const raw=String(text??inp.value).trim();if(!raw||busy)return;
+  inp.value="";
+  if(/[\u0980-\u09FF]/.test(raw))L="bn";else if(/[a-z]{2,}/i.test(raw))L="en";
+  add(raw,"me");showTyping();busy=true;
+  let r;
+  try{r=step?await flow(raw):await reply(raw)}
+  catch(e){console.error(e);step=null;r=R(t("দুঃখিত, সমস্যা হয়েছে। আবার চেষ্টা করুন।","Sorry, something went wrong. Please try again."))}
+  await new Promise(x=>setTimeout(x,350));
+  hideTyping();say(r);busy=false;
+}
+</script>
+
+</body></html>
